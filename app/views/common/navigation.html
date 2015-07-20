@@ -1,0 +1,46 @@
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul side-navigation class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element" dropdown>
+                    <img alt="image" class="img-circle" src="{{main.userAvatar}}" />
+                    <a class="dropdown-toggle" dropdown-toggle href>
+                        <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">{{main.userName}}</strong>
+                             </span>
+                        <span class="text-muted text-xs block">{{main.userClass}} <b class="caret"></b></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a href="../login.html">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    <img width="40" height="auto" src='img/brand_logo.png'>
+                </div>
+
+            </li>
+
+            <li ng-class="{active: true}">
+                <a href="index.html"><i class="fa fa-group"></i> <span class="nav-label">System Admin</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level" ng-class="{in: true}">
+                    <li ui-sref-active="active">
+                        <a ui-sref="index.team-list"> Team Management
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="index.role-list"> Role Management
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="index.client-list"> App Management
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+</nav>

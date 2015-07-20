@@ -1,0 +1,61 @@
+<!-- Wrapper-->
+<div id="wrapper wrapper-content animated fadeInBottom" ng-controller="RoleListCtrl as controller">
+
+
+    <!-- Main view  -->
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <br/>
+            <ol class="breadcrumb">
+                <li>
+                    <span>Role Management</span>
+                </li>
+                <li class="active">
+                    <strong>List</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-lg-2">
+
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Role Management</h5>
+                        <div class="ibox-tools">
+                            <a ui-sref="index.role-create" class="btn btn-primary btn-xs">Create new role</a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <table id="table-role-list" datatable="ng" class="table table-striped table-bordered table-hover dataTables-example" dt-options="controller.dtOptions" dt-column-defs="controller.dtColumnDefs">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="role in controller.roles">
+                                    <td>{{ role.name }}</td>
+                                    <td>{{ role.remarks }}</td>
+                                    <td class='column-action'><span class='btn btn-primary btn-xs' ng-click='controller.edit(role)'>Edit</span>&nbsp;<span ng-if="role.allowDeleteRow" class='btn btn-danger btn-xs' ng-click='controller.delete(role)'>Delete</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div ng-include="'views/common/footer.html'"></div>
+
+
+</div>
+<!-- End wrapper-->
