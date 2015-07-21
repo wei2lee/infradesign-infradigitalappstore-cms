@@ -15,7 +15,7 @@ angular.module('ParseServices', [])
     this.ClientClassName = "Client";
     this.ClientProperties = ['name', 'email', 'contact', 'createdBy'];
     this.AppClassName = "App";
-    this.AppProperties = ['displayname', 'platform', 'internaluse', 'requirement', 'lastupdate', 'logosrc', 'version', 'versionsrc', 'binarysrc', 'plistsrc', 'downloadsrc', 'downloadusername', 'downloadpassword', 'downloadrequireauthencation', 'provisionexpire', 'createdBy'];
+    this.AppProperties = ['name', 'platform', 'internaluse', 'requirement', 'lastupdate', 'logosrc', 'version', 'versionsrc', 'binarysrc', 'plistsrc', 'downloadsrc', 'downloadusername', 'downloadpassword', 'downloadrequireauthencation', 'provisionexpire', 'createdBy'];
 })
 
 .factory('ParseQuery', ['$q', '$rootScope', function ($q, $rootScope) {
@@ -123,11 +123,11 @@ angular.module('ParseServices', [])
             o.className = ParseSDK.ClientClassName;
 
             (function () {
-                Object.defineProperty(o, 'appDisplaynames', {
+                Object.defineProperty(o, 'appNames', {
                     get: function () {
                         if (!this.apps) return '';
                         else return _.map(this.apps, function (app) {
-                            return app.displayname
+                            return app.name
                         }).join(', ');
                     }
                 });

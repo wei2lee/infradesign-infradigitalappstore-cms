@@ -204,10 +204,12 @@ function AppListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseApp, Par
 }
 
 
-function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $state, $stateParams, $timeout, u, modalalert) {
+function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $state, $stateParams, $timeout, u, modalalert, $http) {
     var _this = this;
     this.isEdit = $state.current.name.indexOf("app-edit") >= 0;
     this.client = $rootScope.editClient;
+    this.base = "https://store.infradigital.com.my/infradesign/appstore/";
+
 
 
 
@@ -234,7 +236,7 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             var app = new ParseApp(result);
             modalalert.openAlert(_this, {
                 title: 'Success',
-                message: _this.isEdit ? 'Record ' + app.username + ' is saved to the system.' : 'New record ' + app.username + ' is added to the system.',
+                message: _this.isEdit ? 'Record ' + app.name + ' is saved to the system.' : 'New record ' + app.name + ' is added to the system.',
                 type: 'success'
             });
             if (!_this.isEdit) {
@@ -282,6 +284,34 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         _this.client = new ParseClient(client);
         _this.app = new ParseApp(app);
         _this.app.client = _this.client;
+
+        console.log(client);
+        console.log(app);
+        console.log(app.client);
+        console.log(app.platform == 'ios');
+
+        if (_this.app && _this.app.client && _this.app.platform == 'ios') {
+            $http.get(_this.versionsrc(_this.app)).
+            success(function (data, status, headers, config) {
+                plist = new PlistParser(data);
+                result = plist.parse();
+                var ver = result.items[0].metadata['bundle-version'];
+            }).
+            error(function (data, status, headers, config) {
+                //_this.app.version = '';
+                console.log(data);
+            });
+        } else if (_this.app && _this.app.client && _this.app.platform == 'android') {
+            $http.get(_this.versionsrc(_this.app)).
+            success(function (data, status, headers, config) {
+                var ver = data;
+            }).
+            error(function (data, status, headers, config) {
+                //_this.app.version = '';
+            });
+        } else {
+            return '';
+        }
     }).fail(function (error) {
         modalalert.openAlertWithError(_this, error);
     }).always(function () {
@@ -289,6 +319,46 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             $scope.$apply();
         });
     });
+
+    this.binarysrc = function (app) {
+        if (app && app.client) {
+            return _this.base + app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + (app.platform == 'ios' ? 'ipa' : 'apk');
+        } else {
+            return '';
+        }
+    }
+
+    this.plistsrc = function (app) {
+        if (app && app.client && app.platform == 'ios') {
+            return _this.base + app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'plist';
+        } else {
+            return '';
+        }
+    }
+
+    this.downloadsrc = function (app) {
+        if (app && app.client && app.platform == 'ios') {
+            return 'itms-services://?action=download-manifest&url=' + _this.plistsrc(app);
+        } else if (app && app.client && app.platform == 'android') {
+            return _this.binarysrc(app);
+        } else {
+            return '';
+        }
+    }
+
+    this.versionsrc = function (app) {
+        if (app && app.client && app.platform == 'ios') {
+            return _this.plistsrc(app);
+        } else if (app && app.client && app.platform == 'android') {
+            return _this.base + app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'txt';
+        } else {
+            return '';
+        }
+    }
+
+    this.version = function (app) {
+        return app.version;
+    }
 }
 
 

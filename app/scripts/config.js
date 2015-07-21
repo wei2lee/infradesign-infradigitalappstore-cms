@@ -38,6 +38,17 @@ var resolvePluginDropZone = {
     }
 }
 
+var resolvePluginForm = {
+    loadPlugin: function ($ocLazyLoad) {
+        return $ocLazyLoad.load([
+            {
+                name: 'datePicker',
+                files: ['css/plugins/datapicker/angular-datapicker.css', 'js/plugins/datapicker/angular-datepicker.js']
+            }
+        ]);
+    }
+}
+
 function config($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise("/login");
 
@@ -148,20 +159,20 @@ function config($stateProvider, $urlRouterProvider) {
             resolve: resolvePluginDataTable
         })
         .state('index.app-create', {
-            url: "app/create",
+            url: "client/{clientId}/app/create",
             templateUrl: "views/app-create-edit.html",
             data: {
                 pageTitle: 'App Management - Create'
             },
-            resolve: resolvePluginDropZone
+            resolve: resolvePluginForm
         })
         .state('index.app-edit', {
-            url: "app/edit/{objectId}",
+            url: "client/{clientId}/app/edit/{objectId}",
             templateUrl: "views/app-create-edit.html",
             data: {
                 pageTitle: 'App Management - Edit'
             },
-            resolve: resolvePluginDropZone
+            resolve: resolvePluginForm
         })
 }
 angular
