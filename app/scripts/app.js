@@ -11,7 +11,8 @@
             'ngIdle',
             'countrySelect',
             'ngCookies',
-            'datatables'
+            'datatables',
+            'ngFileUpload'
         ]);
 })();
 

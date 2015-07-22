@@ -209,7 +209,7 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
     this.isEdit = $state.current.name.indexOf("app-edit") >= 0;
     this.client = $rootScope.editClient;
     this.base = "https://store.infradigital.com.my/infradesign/appstore/";
-
+    this.versionsrcuploadfiles = [];
 
 
 
@@ -290,28 +290,6 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         console.log(app.client);
         console.log(app.platform == 'ios');
 
-        if (_this.app && _this.app.client && _this.app.platform == 'ios') {
-            $http.get(_this.versionsrc(_this.app)).
-            success(function (data, status, headers, config) {
-                plist = new PlistParser(data);
-                result = plist.parse();
-                var ver = result.items[0].metadata['bundle-version'];
-            }).
-            error(function (data, status, headers, config) {
-                //_this.app.version = '';
-                console.log(data);
-            });
-        } else if (_this.app && _this.app.client && _this.app.platform == 'android') {
-            $http.get(_this.versionsrc(_this.app)).
-            success(function (data, status, headers, config) {
-                var ver = data;
-            }).
-            error(function (data, status, headers, config) {
-                //_this.app.version = '';
-            });
-        } else {
-            return '';
-        }
     }).fail(function (error) {
         modalalert.openAlertWithError(_this, error);
     }).always(function () {
@@ -319,6 +297,87 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             $scope.$apply();
         });
     });
+
+    this.parseversionsrc = function (data, data2) {
+        if (_this.app && _this.app.client && _this.app.platform == 'ios') {
+            plist = new PlistParser(data);
+            result = plist.parse();
+            var ver = result.items[0].metadata['bundle-version'];
+            _this.app.version = ver;
+            if (typeof data2 == 'function') {
+                var lastmodifieddate = data2()['last-modified'];
+                var parseddate = new Date(lastmodifieddate);
+                _this.app.lastupdate = parseddate;
+            } else {
+                var lastmodifieddate = data2.lastModifiedDate;
+                var parseddate = new Date(lastmodifieddate);
+                _this.app.lastupdate = parseddate;
+            }
+        } else if (_this.app && _this.app.client && _this.app.platform == 'android') {
+            var ver = data;
+            _this.app.version = ver;
+            if (typeof data2 == 'function') {
+                console.log(data2());
+                var lastmodifieddate = data2()['last-modified'];
+                var parseddate = new Date(lastmodifieddate);
+                _this.app.lastupdate = parseddate;
+            } else {
+                var lastmodifieddate = data2.lastModifiedDate;
+                var parseddate = new Date(lastmodifieddate);
+                _this.app.lastupdate = parseddate;
+            }
+        } else {
+            return '';
+        }
+    };
+
+    this.onversionsrcupload = function (files) {
+        if (files[0]) {
+            _this.versionsrcuploadfiles = files;
+            var fr = new FileReader();
+            fr.onload = function () {
+                $timeout(function () {
+                    _this.parseversionsrc(fr.result, files[0]);
+                });
+            };
+            fr.readAsText(files[0]);
+        }
+    }
+    this.onversionsrcurl = function (data) {
+        if (_this.app && _this.app.client && _this.app.platform == 'ios') {
+            $http.get(_this.versionsrc(_this.app)).
+            success(function (data, status, headers, config) {
+                _this.parseversionsrc(data, headers);
+            }).
+            error(function (data, status, headers, config) {
+                modalalert.openAlert(_this, {
+                    title: 'Fail',
+                    message: 'Download version src fail',
+                    type: 'danger'
+                });
+            });
+        } else if (_this.app && _this.app.client && _this.app.platform == 'android') {
+            $http.get(_this.versionsrc(_this.app)).
+            success(function (data, status, headers, config) {
+                _this.parseversionsrc(data, headers);
+            }).
+            error(function (data, status, headers, config) {
+                modalalert.openAlert(_this, {
+                    title: 'Fail',
+                    message: 'Download version src fail',
+                    type: 'danger'
+                });
+            });
+        } else {
+            return '';
+        }
+    }
+
+    this.onmobileprovisionsrcupload = function (data) {
+
+    };
+
+
 
     this.binarysrc = function (app) {
         if (app && app.client) {
@@ -345,7 +404,6 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             return '';
         }
     }
-
     this.versionsrc = function (app) {
         if (app && app.client && app.platform == 'ios') {
             return _this.plistsrc(app);
@@ -355,10 +413,18 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             return '';
         }
     }
-
     this.version = function (app) {
         return app.version;
     }
+
+    $scope.$watchGroup(['controller.app.platform', 'controller.app.name', 'controller.autobinarysrc'], function (newvals, oldvals) {
+        var platform = newvals[0];
+        var name = newvals[1];
+        var autobinarysrc = newvals[2];
+        if (platform && name && autobinarysrc) {
+            _this.app.binarysrc = _this.binarysrc(_this.app);
+        }
+    });
 }
 
 

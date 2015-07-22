@@ -71,8 +71,8 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Version</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control">
-                                    <small>Specific version manually or read it from upload .plist (ios) or .txt (android)</small>
+                                    <input type="text" class="form-control" ng-model="controller.app.version">
+                                    <small>Specific version manually or read it from upload .plist (ios) or .txt (android) / URL</small>
                                 </div>
                             </div>
 
@@ -83,20 +83,26 @@
                                         <input type="datetime" class="form-control" date-time ng-model="controller.app.lastupdate" view="year" max-view="year" min-view="date" auto-close="true">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                     </div>
-                                    <small>Specific last update date manually or read it from upload last-modified-date of .plist (ios) or .txt (android)</small>
+                                    <small>Specific last update date manually or read it from upload last-modified-date of .plist (ios) or .txt (android) / URL</small>
                                 </div>
-                                <!--
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control">
-                                    <small>Specific last update date manually or read it from upload last-modified-date of .plist (ios) or .txt (android)</small>
-                                </div>
--->
                             </div>
 
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"></label>
                                 <div class="col-sm-10">
-                                    <button class="btn btn-primary"><i class="fa fa-upload"></i> Upload</button>
+                                    <button class="btn btn-primary " ngf-select ngf-change="controller.onversionsrcupload($files)"><i class="fa fa-upload"></i> Read from Upload</button>
+                                    <!--                                    &nbsp;&nbsp;<span class="label label-info animated fadeInRight" ng-repeat="f in controller.versionsrcuploadfiles">{{f.name}}</span>-->
+                                    <!--                                    <progressbar class="progress-striped active" max="100" value="100" style="success"></progressbar>-->
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-10">
+                                    <div class="input-group m-b"><span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" ng-click='controller.onversionsrcurl()'><i class="fa fa-download"></i> Read from URL</button> </span>
+                                        <input disabled type="text" class="form-control" value="{{controller.versionsrc(controller.app)}}">
+                                    </div>
                                 </div>
                             </div>
 
@@ -142,17 +148,23 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"></label>
                                 <div class="col-sm-10">
-                                    <input ng-disabled="controller.autobinarysrc" type="text" class="form-control" ng-model="controller.app.binarysrc">
+
+                                    <div class="input-group"><span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary"><i class="fa fa-download"></i> Download</button> </span>
+                                        <input ng-disabled="controller.autobinarysrc" type="text" class="form-control" ng-model="controller.app.binarysrc">
+                                    </div>
+
                                     <small>Specific binary source manually or auto generate base on client and app name</small>
                                 </div>
 
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Provision Expire</label>
+                                <label class="col-sm-2 control-label">Provision Expire
+                                </label>
                                 <div class="col-sm-10">
                                     <div class="input-group date">
-                                        <input type="datetime" class="form-control" date-time ng-model="controller.app.provisionexpire" view="year" max-view="year" min-view="date" auto-close="true">
+                                        <input ng-disabled="controller.app.platform != 'ios'" type="datetime" class="form-control" date-time ng-model="controller.app.provisionexpire" view="year" max-view="year" min-view="date" auto-close="true">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                     </div>
                                     <small>Specific provision expire manually or read it from upload .mobileprovision(ios only)</small>
@@ -162,7 +174,7 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"></label>
                                 <div class="col-sm-10">
-                                    <button class="btn btn-primary"><i class="fa fa-upload"></i> Upload</button>
+                                    <button ng-disabled="controller.app.platform != 'ios'" class="btn btn-primary"><i class="fa fa-upload"></i> Read from Upload</button>
                                 </div>
                             </div>
 
