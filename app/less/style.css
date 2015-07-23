@@ -7534,3 +7534,8 @@ table > thead > tr > th,
 .m-t-xs {
   margin-top: 5px;
 }
+pre {
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre;
+}

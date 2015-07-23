@@ -44,6 +44,9 @@ var resolvePluginForm = {
             {
                 name: 'datePicker',
                 files: ['css/plugins/datapicker/angular-datapicker.css', 'js/plugins/datapicker/angular-datepicker.js']
+            },
+            {
+                files: ['css/plugins/iCheck/custom.css','js/plugins/iCheck/icheck.min.js']
             }
         ]);
     }

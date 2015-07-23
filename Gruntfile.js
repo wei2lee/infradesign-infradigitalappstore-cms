@@ -127,7 +127,8 @@ module.exports = function (grunt) {
                             'styles/patterns/*.*',
                             'img/{,*/}*.*',
                             'js/**',
-                            'css/**'
+                            'css/**',
+                            'resources/**'
                         ]
                     },
                     {

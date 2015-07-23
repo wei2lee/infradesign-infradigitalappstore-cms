@@ -204,30 +204,12 @@ function AppListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseApp, Par
 }
 
 
-function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $state, $stateParams, $timeout, u, modalalert, $http) {
+function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $state, $stateParams, $timeout, u, modalalert, $http, Upload) {
     var _this = this;
     this.isEdit = $state.current.name.indexOf("app-edit") >= 0;
     this.client = $rootScope.editClient;
     this.base = "https://store.infradigital.com.my/infradesign/appstore/";
     this.versionsrcuploadfiles = [];
-
-
-
-    this.delete = function () {
-        modalalert.openLoading(_this, 'Deleting...');
-        modalalert.closeAlert(_this);
-        this.user.data.destroy().done(function (result) {
-            $state.go('index.app-edit', {
-                objectId: _this.app.data.id
-            });
-        }).fail(function (error) {
-            modalalert.openAlertWithError(_this, error);
-        }).always(function () {
-            $loading.dismiss('cancel');
-            $scope.$apply();
-        });
-    }
-
 
     this.save = function () {
         modalalert.openLoading(_this, 'Saving...');
@@ -249,6 +231,10 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         }).always(function () {
             modalalert.closeLoading(_this);
             $scope.$apply();
+        });
+        $http.post('resources/upload_versionsrc.php', {
+            'versionsrcname':_this.versionsrcname(_this.app), 
+            'versioncontent':_this.versioncontent(_this.app)
         });
     }
 
@@ -279,7 +265,7 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         }
         fetchApp = Parse.Promise.as(new ParseApp().data);
     }
-
+    
     Parse.Promise.when(fetchClient, fetchApp).done(function (client, app) {
         _this.client = new ParseClient(client);
         _this.app = new ParseApp(app);
@@ -373,11 +359,34 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         }
     }
 
-    this.onmobileprovisionsrcupload = function (data) {
-
+    this.onprovisionexpireupload = function (files) {
+        if(files.length == 0)return;
+        var fr = new FileReader();
+        fr.onload = function () {
+            $timeout(function () {
+                var splits = fr.result.split("\n");
+                var j = 0;
+                for(k in splits) {
+                    var split = splits[k];
+                    if(split.indexOf("<key>ExpirationDate</key>") >= 0) {
+                        var m = splits[j+1].match(/<date>(.+?)<\/date>/);
+                        _this.app.provisionexpire = new Date(m[1]);
+                        break;
+                    }
+                    j++;
+                }
+            });
+        };
+        fr.readAsText(files[0]);
     };
 
-
+    this.appid = function(app) {
+        if (app && app.client) {
+            return 'com.' + app.client.name + '.' + app.name;
+        } else {
+            return '';
+        }
+    }
 
     this.binarysrc = function (app) {
         if (app && app.client) {
@@ -390,6 +399,52 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
     this.plistsrc = function (app) {
         if (app && app.client && app.platform == 'ios') {
             return _this.base + app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'plist';
+        } else {
+            return '';
+        }
+    }
+    
+    this.plistcontent = function (app) {
+        if (app && app.client && app.platform == 'ios') {
+            var str = 
+                
+                
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+"<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"+
+"<plist version=\"1.0\">\n"+
+"<dict>\n"+
+"	<key>items</key>\n"+
+"	<array>\n"+
+"		<dict>\n"+
+"			<key>assets</key>\n"+
+"			<array>\n"+
+"				<dict>\n"+
+"					<key>kind</key>\n"+
+"					<string>software-package</string>\n"+
+"					<key>url</key>\n"+
+"					<string>"+_this.app.binarysrc+"</string>\n"+
+"				</dict>\n"+
+"			</array>\n"+
+"			<key>metadata</key>\n"+
+"			<dict>\n"+
+"				<key>bundle-identifier</key>\n"+
+"				<string>"+_this.app.appid+"</string>\n"+
+"				<key>bundle-version</key>\n"+
+"				<string>"+_this.app.version+"</string>\n"+
+"				<key>kind</key>\n"+
+"				<string>software</string>\n"+
+"				<key>title</key>\n"+
+"				<string>"+_this.app.displayname+"</string>\n"+
+"			</dict>\n"+
+"		</dict>\n"+
+"	</array>\n"+
+"</dict>\n"+
+"</plist>";
+
+            return str;
+            
+            
+            
         } else {
             return '';
         }
@@ -413,16 +468,47 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             return '';
         }
     }
+    
+    this.versionsrcname = function(app) {
+        if (app && app.client && app.platform == 'ios') {
+            return app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'plist';
+        } else if (app && app.client && app.platform == 'android') {
+            return app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'txt';
+        } else {
+            return '';
+        }
+    }
+    
+    this.versioncontent = function(app) {
+        if (app && app.client && app.platform == 'ios' && app.version) {
+            return _this.plistcontent(app);
+        } else if (app && app.client && app.platform == 'android' && app.version) {
+            return app.version;
+        } else {
+            return '';
+        }
+    }
+    
     this.version = function (app) {
         return app.version;
     }
 
-    $scope.$watchGroup(['controller.app.platform', 'controller.app.name', 'controller.autobinarysrc'], function (newvals, oldvals) {
+    $scope.$watchGroup(['controller.app.platform', 'controller.app.name', 'controller.autobinarysrc', 'controller.app.displayname'], function (newvals, oldvals) {
         var platform = newvals[0];
         var name = newvals[1];
         var autobinarysrc = newvals[2];
-        if (platform && name && autobinarysrc) {
+        var displayname = newvals[3];
+        if (platform && name) {
             _this.app.binarysrc = _this.binarysrc(_this.app);
+        }
+        if(name) {
+            _this.app.versionsrc = _this.versionsrc(_this.app);   
+        }
+        if(name) {
+            _this.app.appid = _this.appid(_this.app);   
+        }
+        if(platform && name) {
+            _this.app.downloadsrc = _this.downloadsrc(_this.app);   
         }
     });
 }
