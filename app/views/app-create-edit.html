@@ -7,10 +7,13 @@
             <ol class="breadcrumb">
                 <br/>
                 <li>
-                    <span>App Management</span>
+                    <a ui-sref="index.client-list">Client Management</a>
+                </li>
+                <li>
+                    <a ui-sref="index.client-edit({objectId:controller.client.data.id})">{{controller.client.name}}</a>
                 </li>
                 <li class="active">
-                    <strong>{{controller.isEdit ? "Edit" : "Create"}} App</strong>
+                    <strong>{{controller.isEdit ? "Edit" : "Create"}} Client App</strong>
                 </li>
             </ol>
         </div>
@@ -43,7 +46,7 @@
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
-                            
+
                             <div class="form-group required" ng-class="{'has-error':form.displayname.$invalid && !form.displayname.$pristine}">
                                 <label class="col-sm-2 control-label">Display name</label>
                                 <div class="col-sm-10">
@@ -53,12 +56,12 @@
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
-                            
+
                             <div class="form-group required" ng-class="{'has-error':form.name.$invalid && !form.name.$pristine}">
                                 <label class="col-sm-2 control-label">Name</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" ng-model="controller.app.name" name="name" required>
-                                    <small>Name is used for auto generating appid, versionsrc and binarysrc. Lowercase is preferred.</small>
+                                    <small>Name is used for auto generating appid, versionsrc and binarysrc. Lowercase is preferred, cannot contains space.</small>
                                     <small ng-show="form.name.$invalid && !form.name.$pristine" class="help-block animated fadeInLeft">Name is required.</small>
                                 </div>
                             </div>
@@ -77,6 +80,18 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Logo</label>
+                                <div class="col-sm-10">
+                                    <img class="m-b" ng-if="controller.app.logosrc" ng-src="{{controller.app.logosrc}}" width=72 height=72>
+                                    <div>
+                                        <button class="btn btn-primary " ngf-select ngf-change="controller.onlogoupload($files) "><i class="fa fa-upload "></i> Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+
 
                             <div class="hr-line-dashed"></div>
 
@@ -84,7 +99,7 @@
                                 <label class="col-sm-2 control-label">Version</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" ng-model="controller.app.version">
-                                    <small>Bundle version short string (ios) / Version Name (android)</small>
+                                    <small>Bundle version short string (ios) / Version Name (android), make sure your project has same setting</small>
                                 </div>
                             </div>
 
@@ -97,28 +112,22 @@
                                     </div>
                                 </div>
                             </div>
-
-<!--
+                            <div class="hr-line-dashed"></div>
+                            
                             <div class="form-group">
-                                <label class="col-sm-2 control-label"></label>
+                                <label class="col-sm-2 control-label">Requirement</label>
                                 <div class="col-sm-10">
-                                    <button class="btn btn-primary " ngf-select ngf-change="controller.onversionsrcupload($files)"><i class="fa fa-upload"></i> Read from Upload</button>
+                                    <input type="text" class="form-control" ng-model="controller.app.requirement">
                                 </div>
                             </div>
--->
-
-<!--
+                            <div class="hr-line-dashed"></div>
+                            
                             <div class="form-group">
-                                <label class="col-sm-2 control-label"></label>
+                                <label class="col-sm-2 control-label">Policy</label>
                                 <div class="col-sm-10">
-                                    <div class="input-group m-b"><span class="input-group-btn">
-                                        <button type="button" class="btn btn-primary" ng-click='controller.onversionsrcurl()'><i class="fa fa-download"></i> Read from URL</button> </span>
-                                        <input disabled type="text" class="form-control" value="{{controller.versionsrc(controller.app)}}">
-                                    </div>
+                                    <input type="text" class="form-control" ng-model="controller.app.internaluse">
                                 </div>
                             </div>
--->
-
                             <div class="hr-line-dashed"></div>
 
                             <div class="form-group">
@@ -128,6 +137,7 @@
                                         <label>
                                             <input icheck type="checkbox" name="downloadrequireauthencation" ng-model="controller.app.downloadrequireauthencation"> Require </label>
                                     </div>
+                                    <small>Authencation specified require user login for downloading the app in web private appstore </small>
                                 </div>
                             </div>
 
@@ -150,74 +160,77 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">App ID</label>
                                 <div class="col-sm-10">
-                                        <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.appid}}">
-                                    <small>The bundle id(ios) / package name(android) is auto generated base on client and app name, make sure your project has exact same thing</small>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Binary Source</label>
-                                <div class="col-sm-10">
-                                        <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.binarysrc}}">
-                                    <small>The url of binary source is auto generated base on client and app name, make sure you upload the binary to exact ftp location</small>
-                                </div>
-                            </div>
-                            
-                            
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Version Source</label>
-                                <div class="col-sm-10">
-                                        <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.versionsrc}}">
-                                    <small>The url of version source is auto generated base on platform, client and app name</small>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Version Content</label>
-                                <div class="col-sm-10">
-                                    <pre>{{controller.versioncontent(controller.app)}}</pre>
-                                    <small>The content of version source (.plist for ios, .txt for android) is auto generated base on platform, client and app name. This url will serve as online version checking for mobile apps</small>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Download Source</label>
-                                <div class="col-sm-10">
-                                        <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.downloadsrc}}">
-                                    <small>The url of binary source is auto generated base on platform, client and app name, This url will serve as online version checking for mobile apps</small>
-                                </div>
-                            </div>
-                            
-                            <div class="hr-line-dashed"></div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Provision Expire
-                                </label>
-                                <div class="col-sm-10">
-                                    <div class="input-group date">
-                                        <input ng-disabled="controller.app.platform != 'ios'" type="datetime" class="form-control" date-time ng-model="controller.app.provisionexpire" view="year" max-view="year" min-view="date" auto-close="true">
-                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    </div>
-                                    <small>Specific provision expire manually or read it from upload .mobileprovision (ios only)</small>
+                                    <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.appid}}">
+                                    <small>The bundle id(ios) / package name(android) is auto generated base on client and app name, make sure your project has same setting</small>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-2 control-label"></label>
+                                <label class="col-sm-2 control-label">Binary Source</label>
                                 <div class="col-sm-10">
-                                    <button class="btn btn-primary " ngf-select ngf-change="controller.onprovisionexpireupload($files)"><i class="fa fa-upload"></i> Read from Upload</button>
+                                    <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.binarysrc}}">
+                                    <small>The url of binary source is auto generated base on client and app name, make sure you upload the binary to exact ftp location</small>
                                 </div>
                             </div>
-                            <div class="hr-line-dashed"></div>
+
+
                             <div class="form-group">
-                                <div class="col-xs-10 col-xs-offset-2">
-                                    <small>By clicking save, all info will be save to backend, and version src will be upload to {{controller.versionsrc(controller.app)}}</small>
+                                <label class="col-sm-2 control-label">Version Source</label>
+                                <div class="col-sm-10">
+                                    <input ng-disabled="true" type="text" class="form-control" value="{{controller.app.versionsrc}}">
+                                    <small>The url of version source is auto generated base on platform, client and app name</small>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
-                                <div class="col-sm-4 col-sm-offset-2">
-                                    <a class="btn btn-white" type="submit" ui-sref="index.client-edit({objectId:controller.client.data.id})">Back</a>
-                                    <button class="btn btn-primary" type="submit" ng-click="controller.save()" ng-disabled="form.$invalid">Save</button>
+                                <label class="col-sm-2 control-label">Version Content</label>
+                                <div class="col-sm-10">
+                                    <!--                                    <div ng-if="{{controller.versioncontent(controller.app)}}">-->
+                                    <pre>{{controller.versioncontent(controller.app)}}</pre>
+                                    <small>The content of version source (.plist for ios, .txt for android) is auto generated base on platform, client and app name. This url will serve as online version checking for mobile apps</small>
+                                    <!--                                    </div>-->
+                                </div>
+                            </div>
+
+                            <div class=" form-group ">
+                                <label class="col-sm-2 control-label ">Download Source</label>
+                                <div class="col-sm-10 ">
+                                    <input ng-disabled="true " type="text " class="form-control " value="{{controller.app.downloadsrc}} ">
+                                    <small>The url of binary source is auto generated base on platform, client and app name, This url will serve as download link in mobile online version checking / web private appstore</small>
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed "></div>
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label ">Provision Expire
+                                </label>
+                                <div class="col-sm-10 ">
+                                    <div class="input-group date ">
+                                        <input ng-disabled="controller.app.platform !='ios' " type="datetime " class="form-control " date-time ng-model="controller.app.provisionexpire " view="year " max-view="year " min-view="date " auto-close="true ">
+                                        <span class="input-group-addon "><i class="fa fa-calendar "></i></span>
+                                    </div>
+                                    <small>Specific provision expire manually or read it from upload .mobileprovision (ios only). The .mobileprovision has a key "ExpirationDate " for this purpose.</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label "></label>
+                                <div class="col-sm-10 ">
+                                    <button class="btn btn-primary " ngf-select ngf-change="controller.onprovisionexpireupload($files) "><i class="fa fa-upload "></i> Read from Upload</button>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed "></div>
+                            <div class="form-group ">
+                                <div class="col-xs-10 col-xs-offset-2 ">
+                                    <div><small>By clicking save, all info will be save to backend</small><small ng-if="controller.app.versionsrc">and version src will be upload to {{controller.versionsrc(controller.app)}}</small><small>.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <div class="col-sm-4 col-sm-offset-2 ">
+                                    <a class="btn btn-white " type="submit " ui-sref="index.client-edit({objectId:controller.client.data.id}) ">Back</a>
+                                    <button class="btn btn-primary " type="submit " ng-click="controller.save() " ng-disabled="form.$invalid ">Save</button>
                                 </div>
 
                             </div>

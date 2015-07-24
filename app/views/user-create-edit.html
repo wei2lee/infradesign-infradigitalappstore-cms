@@ -9,6 +9,9 @@
                 <li>
                     <span>Team Management</span>
                 </li>
+                <li>
+                    <a ui-sref="index.team-edit({objectId:controller.team.data.id})">{{controller.team.name}}</a>
+                </li>
                 <li class="active">
                     <strong>{{controller.isEdit ? "Edit" : "Create"}} Team Member</strong>
                 </li>

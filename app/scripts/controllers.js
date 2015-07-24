@@ -204,11 +204,11 @@ function AppListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseApp, Par
 }
 
 
-function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $state, $stateParams, $timeout, u, modalalert, $http, Upload) {
+function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $rootScope, $state, $stateParams, $timeout, u, modalalert, $http, Upload) {
     var _this = this;
     this.isEdit = $state.current.name.indexOf("app-edit") >= 0;
     this.client = $rootScope.editClient;
-    this.base = "https://store.infradigital.com.my/infradesign/appstore/";
+    this.base = ftpBase;
     this.versionsrcuploadfiles = [];
 
     this.save = function () {
@@ -226,15 +226,23 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
                 $scope.form.$setPristine();
                 $scope.$apply();
             }
+            
+            $.post('resources/upload_versionsrc.php', {
+                'versionsrcname': _this.versionsrcname(_this.app),
+                'versioncontent': _this.versioncontent(_this.app),
+                'versionsrcdir': _this.versionsrcdir(_this.app)
+            }).done(function(result){
+                //console.log(result);
+            }).fail(function(error){
+                $timeout(function(){
+                    modalalert.openAlertWithError(_this, 'danger', 'Fail', error);
+                });
+            });
         }).fail(function (error) {
             modalalert.openAlertWithError(_this, error);
         }).always(function () {
             modalalert.closeLoading(_this);
             $scope.$apply();
-        });
-        $http.post('resources/upload_versionsrc.php', {
-            'versionsrcname':_this.versionsrcname(_this.app), 
-            'versioncontent':_this.versioncontent(_this.app)
         });
     }
 
@@ -265,17 +273,11 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         }
         fetchApp = Parse.Promise.as(new ParseApp().data);
     }
-    
+
     Parse.Promise.when(fetchClient, fetchApp).done(function (client, app) {
         _this.client = new ParseClient(client);
         _this.app = new ParseApp(app);
         _this.app.client = _this.client;
-
-        console.log(client);
-        console.log(app);
-        console.log(app.client);
-        console.log(app.platform == 'ios');
-
     }).fail(function (error) {
         modalalert.openAlertWithError(_this, error);
     }).always(function () {
@@ -283,6 +285,24 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             $scope.$apply();
         });
     });
+
+    this.onlogoupload = function (files) {
+        if (files.length == 0) return;
+        var parseFile = new Parse.File(files[0].name, files[0]);
+        _this.app.logosrc = '';
+        parseFile.save().done(function (result) {
+            $timeout(function () {
+                _this.app.logosrc = result.url();
+            });
+        }).fail(function (error) {
+            if (error.code == Parse.Error.INVALID_FILE_NAME) {
+                error.message += " file name can only contain character set in a-zA-Z0-9_";
+            }
+            modalalert.openAlertWithError(_this, error);
+        }).always(function () {
+            $scope.$apply();
+        });
+    };
 
     this.parseversionsrc = function (data, data2) {
         if (_this.app && _this.app.client && _this.app.platform == 'ios') {
@@ -360,16 +380,16 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
     }
 
     this.onprovisionexpireupload = function (files) {
-        if(files.length == 0)return;
+        if (files.length == 0) return;
         var fr = new FileReader();
         fr.onload = function () {
             $timeout(function () {
                 var splits = fr.result.split("\n");
                 var j = 0;
-                for(k in splits) {
+                for (k in splits) {
                     var split = splits[k];
-                    if(split.indexOf("<key>ExpirationDate</key>") >= 0) {
-                        var m = splits[j+1].match(/<date>(.+?)<\/date>/);
+                    if (split.indexOf("<key>ExpirationDate</key>") >= 0) {
+                        var m = splits[j + 1].match(/<date>(.+?)<\/date>/);
                         _this.app.provisionexpire = new Date(m[1]);
                         break;
                     }
@@ -380,7 +400,7 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         fr.readAsText(files[0]);
     };
 
-    this.appid = function(app) {
+    this.appid = function (app) {
         if (app && app.client) {
             return 'com.' + app.client.name + '.' + app.name;
         } else {
@@ -403,48 +423,48 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             return '';
         }
     }
-    
+
     this.plistcontent = function (app) {
         if (app && app.client && app.platform == 'ios') {
-            var str = 
-                
-                
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"+
-"<plist version=\"1.0\">\n"+
-"<dict>\n"+
-"	<key>items</key>\n"+
-"	<array>\n"+
-"		<dict>\n"+
-"			<key>assets</key>\n"+
-"			<array>\n"+
-"				<dict>\n"+
-"					<key>kind</key>\n"+
-"					<string>software-package</string>\n"+
-"					<key>url</key>\n"+
-"					<string>"+_this.app.binarysrc+"</string>\n"+
-"				</dict>\n"+
-"			</array>\n"+
-"			<key>metadata</key>\n"+
-"			<dict>\n"+
-"				<key>bundle-identifier</key>\n"+
-"				<string>"+_this.app.appid+"</string>\n"+
-"				<key>bundle-version</key>\n"+
-"				<string>"+_this.app.version+"</string>\n"+
-"				<key>kind</key>\n"+
-"				<string>software</string>\n"+
-"				<key>title</key>\n"+
-"				<string>"+_this.app.displayname+"</string>\n"+
-"			</dict>\n"+
-"		</dict>\n"+
-"	</array>\n"+
-"</dict>\n"+
-"</plist>";
+            var str =
+
+
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" +
+                "<plist version=\"1.0\">\n" +
+                "<dict>\n" +
+                "	<key>items</key>\n" +
+                "	<array>\n" +
+                "		<dict>\n" +
+                "			<key>assets</key>\n" +
+                "			<array>\n" +
+                "				<dict>\n" +
+                "					<key>kind</key>\n" +
+                "					<string>software-package</string>\n" +
+                "					<key>url</key>\n" +
+                "					<string>" + _this.app.binarysrc + "</string>\n" +
+                "				</dict>\n" +
+                "			</array>\n" +
+                "			<key>metadata</key>\n" +
+                "			<dict>\n" +
+                "				<key>bundle-identifier</key>\n" +
+                "				<string>" + _this.app.appid + "</string>\n" +
+                "				<key>bundle-version</key>\n" +
+                "				<string>" + _this.app.version + "</string>\n" +
+                "				<key>kind</key>\n" +
+                "				<string>software</string>\n" +
+                "				<key>title</key>\n" +
+                "				<string>" + _this.app.displayname + "</string>\n" +
+                "			</dict>\n" +
+                "		</dict>\n" +
+                "	</array>\n" +
+                "</dict>\n" +
+                "</plist>";
 
             return str;
-            
-            
-            
+
+
+
         } else {
             return '';
         }
@@ -468,18 +488,25 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             return '';
         }
     }
-    
-    this.versionsrcname = function(app) {
+
+    this.versionsrcdir = function (app) {
+        if (app && app.client) {
+            return app.client.name + '/' + app.name;
+            return '';
+        }
+    }
+
+    this.versionsrcname = function (app) {
         if (app && app.client && app.platform == 'ios') {
-            return app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'plist';
+            return app.client.name + '_' + app.name + '.' + 'plist';
         } else if (app && app.client && app.platform == 'android') {
-            return app.client.name + '/' + app.name + '/' + app.client.name + '_' + app.name + '.' + 'txt';
+            return app.client.name + '_' + app.name + '.' + 'txt';
         } else {
             return '';
         }
     }
-    
-    this.versioncontent = function(app) {
+
+    this.versioncontent = function (app) {
         if (app && app.client && app.platform == 'ios' && app.version) {
             return _this.plistcontent(app);
         } else if (app && app.client && app.platform == 'android' && app.version) {
@@ -488,7 +515,7 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
             return '';
         }
     }
-    
+
     this.version = function (app) {
         return app.version;
     }
@@ -501,14 +528,14 @@ function AppCreateEditCtrl($scope, ParseApp, ParseClient, $modal, $rootScope, $s
         if (platform && name) {
             _this.app.binarysrc = _this.binarysrc(_this.app);
         }
-        if(name) {
-            _this.app.versionsrc = _this.versionsrc(_this.app);   
+        if (name) {
+            _this.app.versionsrc = _this.versionsrc(_this.app);
         }
-        if(name) {
-            _this.app.appid = _this.appid(_this.app);   
+        if (name) {
+            _this.app.appid = _this.appid(_this.app);
         }
-        if(platform && name) {
-            _this.app.downloadsrc = _this.downloadsrc(_this.app);   
+        if (platform && name) {
+            _this.app.downloadsrc = _this.downloadsrc(_this.app);
         }
     });
 }

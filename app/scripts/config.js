@@ -46,7 +46,7 @@ var resolvePluginForm = {
                 files: ['css/plugins/datapicker/angular-datapicker.css', 'js/plugins/datapicker/angular-datepicker.js']
             },
             {
-                files: ['css/plugins/iCheck/custom.css','js/plugins/iCheck/icheck.min.js']
+                files: ['css/plugins/iCheck/custom.css', 'js/plugins/iCheck/icheck.min.js']
             }
         ]);
     }
@@ -75,6 +75,9 @@ function config($stateProvider, $urlRouterProvider) {
             data: {
                 pageTitle: 'Team Management - List'
             },
+            ncyBreadcrumb: {
+                label: 'Team Management / List'
+            },
             resolve: resolvePluginDataTable
         })
         .state('index.team-create', {
@@ -82,13 +85,19 @@ function config($stateProvider, $urlRouterProvider) {
             templateUrl: "views/team-create-edit.html",
             data: {
                 pageTitle: 'Team Management - Create'
-            }
+            },
+            ncyBreadcrumb: {
+                label: 'Team Management / Create'
+            },
         })
         .state('index.team-edit', {
             url: "team/edit/{objectId}",
             templateUrl: "views/team-create-edit.html",
             data: {
                 pageTitle: 'Team Management - Edit'
+            },
+            ncyBreadcrumb: {
+                label: 'Team Management / Edit'
             },
             resolve: resolvePluginDataTable
         })
@@ -329,6 +338,7 @@ angular
             $state.go('login');
         };
     })
+    .value('ftpBase', "https://store.infradigital.com.my/infradesign/appstore/")
     .value('countries', [
         {
             code: 'AF',

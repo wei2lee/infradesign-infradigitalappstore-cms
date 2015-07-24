@@ -12,7 +12,9 @@
             'countrySelect',
             'ngCookies',
             'datatables',
-            'ngFileUpload'
+            'ngFileUpload',
+            'ncy-angular-breadcrumb',
+            'ngAnimate'
         ]);
 })();
 

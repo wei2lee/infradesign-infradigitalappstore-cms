@@ -19,7 +19,7 @@ $config = array(
         "port" => 21
     ),
     "app" => array(
-        "base_dir" => "/infradesign/appstore/"
+        "base_dir" => "/infradesign/appstore/staging/"
     ),
     "isDev" => $isDev
 );

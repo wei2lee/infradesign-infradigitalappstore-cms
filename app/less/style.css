@@ -7538,4 +7538,5 @@ pre {
   overflow: auto;
   word-wrap: normal;
   white-space: pre;
+  min-height: 34px;
 }
