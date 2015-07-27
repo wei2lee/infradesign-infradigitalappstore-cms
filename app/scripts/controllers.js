@@ -25,7 +25,7 @@ function LoginCtrl($scope, authencation, $modal, $timeout, $state, ParseSDK, mod
         modalalert.openLoading(_this, 'Login...');
         modalalert.closeAlert(_this);
         authencation.login($scope.userName, $scope.password).done(function (result) {
-            $state.go('index.team-list');
+            $state.go('index.client-list');
             Parse.Cloud.run('afterLogin', {
                 objectId: result.id
             });
@@ -64,6 +64,7 @@ function ClientListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseClien
             return o;
         });
         var appQuery = new Parse.Query(new ParseApp().className);
+        appQuery.ascending('displayname');
         return appQuery.find();
     }).done(function (result) {
         _this.apps = _.map(result, function (o) {
@@ -223,16 +224,21 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
             });
             if (!_this.isEdit) {
                 _this.app = new ParseApp();
+                _this.app.client = _this.client;
                 $scope.form.$setPristine();
                 $scope.$apply();
             }
-            
             $.post('resources/upload_versionsrc.php', {
                 'versionsrcname': _this.versionsrcname(_this.app),
                 'versioncontent': _this.versioncontent(_this.app),
                 'versionsrcdir': _this.versionsrcdir(_this.app)
             }).done(function(result){
                 //console.log(result);
+                if(result) {
+                    $timeout(function(){
+                        modalalert.openAlertWithError(_this, 'danger', 'Fail', result);
+                    });
+                }
             }).fail(function(error){
                 $timeout(function(){
                     modalalert.openAlertWithError(_this, 'danger', 'Fail', error);

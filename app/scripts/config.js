@@ -189,6 +189,13 @@ function config($stateProvider, $urlRouterProvider) {
 }
 angular
     .module('inspinia')
+    .config( [
+        '$compileProvider',
+        function( $compileProvider )
+        {   
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|itms-services):/);
+        }
+    ])
     .config(config)
     .factory('modalalert', function ($modal) {
         var _this = this;

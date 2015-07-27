@@ -42,7 +42,6 @@
                                     <th>Email</th>
                                     <th>Contact</th>
                                     <th>Apps</th>
-                                    <!--                                    <th>Created By</th>-->
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -51,8 +50,11 @@
                                     <td>{{ client.name || '' }}</td>
                                     <td>{{ client.email || '' }}</td>
                                     <td>{{ client.contact || '' }}</td>
-                                    <td>{{ client.appNames || '' }}</td>
-                                    <!--                                    <td>{{ client.createdBy || '' }}</td>-->
+                                    <td>
+                                        <a ui-sref="index.app-edit({clientId:'{{client.data.id}}', objectId:'{{app.data.id}}'})" ng-repeat="app in client.apps">{{app.displayname}}({{app.platform}}){{$last ? '' : ', '}}</a>
+                                    </td>
+<!--                                    <td>{{client.appLinks}}</td>-->
+<!--                                    <td>{{ client.appNames || '' }}</td>-->
                                     <td class='column-action'><span class='btn btn-primary btn-xs' ng-click='controller.edit(client)'>Edit</span>&nbsp;<span class='btn btn-danger btn-xs' ng-click='controller.delete(client)'>Delete</span>
                                     </td>
                                 </tr>

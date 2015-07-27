@@ -15,6 +15,7 @@
             'ngFileUpload',
             'ncy-angular-breadcrumb',
             'ngAnimate'
+//            'ngSanitize'
         ]);
 })();
 
