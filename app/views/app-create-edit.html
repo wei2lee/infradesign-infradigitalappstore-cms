@@ -85,7 +85,7 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Logo</label>
                                 <div class="col-sm-10">
-                                    <img class="m-b" ng-if="controller.app.logosrc" ng-src="{{controller.app.logosrc}}" width=72 height=72>
+                                    <img class="m-b app-logo" ng-if="controller.app.logosrc" ng-src="{{controller.app.logosrc}}" >
                                     <div>
                                         <button class="btn btn-primary " ngf-select ngf-change="controller.onlogoupload($files) "><i class="fa fa-upload "></i> Upload</button>
                                     </div>
@@ -245,8 +245,8 @@
                                 <div class="col-sm-4 col-sm-offset-2 ">
                                     <a class="btn btn-white " type="submit " ui-sref="index.client-edit({objectId:controller.client.data.id}) ">Back</a>
                                     <button class="btn btn-primary " type="submit " ng-click="controller.save() " ng-disabled="form.$invalid ">Save</button>
+                                    <a class="btn btn-primary " type="submit " ng-href="{{controller.app.binarysrc}}" ng-disabled="!controller.app.binarysrc">Download{{controller.app.platform=='ios'?' .ipa':(controller.app.platform=='android'?' .apk':'')}}</a>
                                 </div>
-
                             </div>
                         </form>
                     </div>

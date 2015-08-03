@@ -212,6 +212,23 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
     this.base = ftpBase;
     this.versionsrcuploadfiles = [];
 
+//    this.testversion = function() {
+//        $.ajax('https://api.parse.com/1/classes/App', {
+//            headers:{
+//                'X-Parse-Application-Id':'N59sh8HxHKoO6MLT84zWAcQ1gQL3cxiZqBSWU2Bb',
+//                'X-Parse-REST-API-Key':'Du9EmhSrxz1lCFUeGF34fc2Ybq5RK6ZJaiQvxKrf'
+//            },
+//            data: {
+//                'where':'{"appid":"'+_this.app.appid+'"}'   
+//            }
+//        }).done(function(data, textStatus, jqXHR) {
+//            console.log(data);
+//            
+//        }).fail(function(jqXHR, textStatus, errorThrown) {
+//            console.log(errorThrown);
+//        });
+//    }
+    
     this.save = function () {
         modalalert.openLoading(_this, 'Saving...');
         modalalert.closeAlert(_this);
@@ -244,12 +261,18 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
                     modalalert.openAlertWithError(_this, 'danger', 'Fail', error);
                 });
             });
+            
+            
+//            _this.testversion();
         }).fail(function (error) {
             modalalert.openAlertWithError(_this, error);
         }).always(function () {
             modalalert.closeLoading(_this);
             $scope.$apply();
         });
+    }
+    this.downloadbinarysrc = function() {
+        
     }
 
     var fetchClient = null;

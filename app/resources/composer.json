@@ -1,0 +1,12 @@
+{
+    "name": "infradesign/resources",
+    "authors": [
+        {
+            "name": "wei2lee",
+            "email": "wei2lee86@gmail.com"
+        }
+    ],
+    "require": {
+        "parse/php-sdk" : "~1.1"
+    }
+}

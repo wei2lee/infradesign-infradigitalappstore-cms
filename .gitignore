@@ -2,3 +2,6 @@ bower_components
 node_modules
 dist
 .tmp
+vendor
+app/styles/style.css
+app/styles/style.min.css
