@@ -56,6 +56,15 @@ function ClientListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseClien
             objectId: client.data.id
         });
     };
+    
+    this.editApp = function(client, app) {
+        $rootScope.editClient = client;
+        $rootScope.editApp = app;
+        $state.go('index.app-edit', {
+            clientId: client.data.id,
+            objectId: app.data.id
+        });
+    }
 
     var clientQuery = new Parse.Query(new ParseClient().className);
     clientQuery.find().done(function (result) {
@@ -211,23 +220,6 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
     this.client = $rootScope.editClient;
     this.base = ftpBase;
     this.versionsrcuploadfiles = [];
-
-//    this.testversion = function() {
-//        $.ajax('https://api.parse.com/1/classes/App', {
-//            headers:{
-//                'X-Parse-Application-Id':'N59sh8HxHKoO6MLT84zWAcQ1gQL3cxiZqBSWU2Bb',
-//                'X-Parse-REST-API-Key':'Du9EmhSrxz1lCFUeGF34fc2Ybq5RK6ZJaiQvxKrf'
-//            },
-//            data: {
-//                'where':'{"appid":"'+_this.app.appid+'"}'   
-//            }
-//        }).done(function(data, textStatus, jqXHR) {
-//            console.log(data);
-//            
-//        }).fail(function(jqXHR, textStatus, errorThrown) {
-//            console.log(errorThrown);
-//        });
-//    }
     
     this.save = function () {
         modalalert.openLoading(_this, 'Saving...');
@@ -549,18 +541,19 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
         return app.version;
     }
 
-    $scope.$watchGroup(['controller.app.platform', 'controller.app.name', 'controller.autobinarysrc', 'controller.app.displayname'], function (newvals, oldvals) {
+    $scope.$watchGroup(['controller.app.platform', 'controller.app.name', 'controller.autobinarysrc', 'controller.app.displayname', 'controller.app.autogenerateappid'], function (newvals, oldvals) {
         var platform = newvals[0];
         var name = newvals[1];
         var autobinarysrc = newvals[2];
         var displayname = newvals[3];
+        var autogenerateappid = newvals[4];
         if (platform && name) {
             _this.app.binarysrc = _this.binarysrc(_this.app);
         }
         if (name) {
             _this.app.versionsrc = _this.versionsrc(_this.app);
         }
-        if (name) {
+        if (name && autogenerateappid) {
             _this.app.appid = _this.appid(_this.app);
         }
         if (platform && name) {

@@ -126,9 +126,8 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="app in controller.client.apps">
-                                    <td>{{ app.displayname || '' }}</td>
+                                    <td><a ng-click="controller.edit(controller.client, app)">{{ app.displayname || '' }}</a></td>
                                     <td>{{ app.version || '' }}</td>
-<!--                                    <td>{{ app.platform }}</td>-->
                                     <td><i class="fa" ng-class="{'fa-apple':app.platform == 'ios', 'fa-android':app.platform == 'android'}"></i></td>
                                     <td>{{ app.lastupdate.toDateString() || '' }}</td>
                                     <td>{{ app.provisionexpire.toDateString() || '' }}</td>

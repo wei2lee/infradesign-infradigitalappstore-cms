@@ -15,7 +15,7 @@ angular.module('ParseServices', [])
     this.ClientClassName = "Client";
     this.ClientProperties = ['name', 'email', 'contact', 'createdBy'];
     this.AppClassName = "App";
-    this.AppProperties = ['visible', 'displayname', 'appid', 'name', 'platform', 'internaluse', 'requirement', 'lastupdate', 'logosrc', 'version', 'versionsrc', 'binarysrc', 'plistsrc', 'downloadsrc', 'downloadusername', 'downloadpassword', 'downloadrequireauthencation', 'provisionexpire', 'createdBy'];
+    this.AppProperties = ['autogenerateappid', 'visible', 'displayname', 'appid', 'name', 'platform', 'internaluse', 'requirement', 'lastupdate', 'logosrc', 'version', 'versionsrc', 'binarysrc', 'plistsrc', 'downloadsrc', 'downloadusername', 'downloadpassword', 'downloadrequireauthencation', 'provisionexpire', 'createdBy'];
 })
 
 .factory('ParseQuery', ['$q', '$rootScope', function ($q, $rootScope) {
@@ -142,6 +142,10 @@ angular.module('ParseServices', [])
             o.className = ParseSDK.AppClassName;
             if(!parseData) {
                 o.visible = true;
+                o.autogenerateappid = true;
+            }
+            if(o.autogenerateappid === undefined) {
+                o.autogenerateappid = true;
             }
             (function () {
                 Object.defineProperty(o, 'client', {
