@@ -1,8 +1,13 @@
 <?php
 
 require 'vendor/autoload.php';
-include_once "config.php"
+include_once "config.php";
  
+// require_once 'vendor/php-sdk/src/Parse/ParseClient.php';
+// require_once 'vendor/php-sdk/src/Parse/ParseObject.php';
+// require_once 'vendor/php-sdk/src/Parse/ParseQuery.php';
+
+
 use Parse\ParseClient;
 use Parse\ParseObject;
 use Parse\ParseQuery;

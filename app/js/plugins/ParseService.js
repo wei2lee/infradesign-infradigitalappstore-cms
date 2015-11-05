@@ -147,6 +147,15 @@ angular.module('ParseServices', [])
             if(o.autogenerateappid === undefined) {
                 o.autogenerateappid = true;
             }
+            if(o.lastupdate === undefined) {
+                o.lastupdate = new Date();   
+            }
+            if(o.internaluse === undefined) {
+                o.internaluse = 'This app is for Internal Use Only';   
+            }
+            if(o.requirement === undefined) {
+                o.requirement = 'iOS 7.1.1 or above';   
+            }
             (function () {
                 Object.defineProperty(o, 'client', {
                     get: function () {
@@ -156,6 +165,17 @@ angular.module('ParseServices', [])
                     set: function (value) {
                         if (!value) this.data.set('client', undefined);
                         else this.data.set('client', value.data);
+                    }
+                });
+                
+                Object.defineProperty(o, 'defaultappid', {
+                    get: function () {
+                        var app = this;
+                        if (app && app.client) {
+                            return 'com.' + app.client.name + '.' + app.name;
+                        } else {
+                            return '';
+                        }
                     }
                 });
             })();

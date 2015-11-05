@@ -131,7 +131,10 @@
                                     <td><i class="fa" ng-class="{'fa-apple':app.platform == 'ios', 'fa-android':app.platform == 'android'}"></i></td>
                                     <td>{{ app.lastupdate.toDateString() || '' }}</td>
                                     <td>{{ app.provisionexpire.toDateString() || '' }}</td>
-                                    <td class='column-action'><span class='btn btn-primary btn-xs' ng-click='controller.edit(clientController.client, app)'>Edit</span>&nbsp;<span class='btn btn-danger btn-xs' ng-click='controller.delete(app)'>Delete</span>
+                                    <td class='column-action'>
+                                        <span class='btn btn-primary btn-xs' ng-click='controller.edit(clientController.client, app)'>Edit</span>&nbsp;
+                                        <span class='btn btn-danger btn-xs' ng-click='controller.delete(app)'>Delete</span>&nbsp;
+                                        <span class='btn btn-primary btn-xs' ng-click='controller.updateLastUpdate(app)'>Update last update</span>&nbsp;
                                     </td>
                                 </tr>
                             </tbody>

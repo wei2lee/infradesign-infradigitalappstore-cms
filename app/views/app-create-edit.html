@@ -67,7 +67,7 @@
                             </div>
                             <div class="hr-line-dashed"></div>
 
-                            <div class="form-group">
+                            <div class="form-group required" ng-class="{'has-error':form.platform.$invalid && !form.platform.$pristine}">
                                 <label class="col-sm-2 control-label">Platform</label>
                                 <div class="col-sm-10">
                                     <div class="m-t-xs">
@@ -78,6 +78,7 @@
                                         <label>
                                             <input icheck type="radio" name="platform" ng-model="controller.app.platform" value="android"> Android </label>
                                     </div>
+                                    <small ng-show="form.platform.$invalid && !form.platform.$pristine" class="help-block animated fadeInLeft">Platform is required.</small>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -95,11 +96,12 @@
 
                             <div class="hr-line-dashed"></div>
 
-                            <div class="form-group">
+                            <div class="form-group required" ng-class="{'has-error':form.version.$invalid && !form.version.$pristine}">
                                 <label class="col-sm-2 control-label">Version</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" ng-model="controller.app.version">
                                     <small>Bundle version short string (ios) / Version Name (android), make sure your project has same setting</small>
+                                    <small ng-show="form.version.$invalid && !form.version.$pristine" class="help-block animated fadeInLeft">Version is required.</small>
                                 </div>
                             </div>
 
@@ -107,6 +109,9 @@
                                 <label class="col-sm-2 control-label">Last Update</label>
                                 <div class="col-sm-10">
                                     <div class="input-group date">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary" type="button" ng-click="controller.updateLastUpdate()">Today</button>
+                                        </span>
                                         <input type="datetime" class="form-control" date-time ng-model="controller.app.lastupdate" view="year" max-view="year" min-view="date" auto-close="true">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                     </div>
@@ -117,7 +122,14 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Requirement</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" ng-model="controller.app.requirement">
+                                    
+                                    <div class="input-group">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary" type="button" ng-click="controller.setDefaultRequirement()">Default</button>
+                                        </span>
+                                        <input type="text" class="form-control" ng-model="controller.app.requirement">
+                                    </div>
+                                    
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -125,7 +137,13 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Policy</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" ng-model="controller.app.internaluse">
+                                    
+                                    <div class="input-group">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary" type="button" ng-click="controller.setDefaultInternalUse()">Default</button>
+                                        </span>
+                                        <input type="text" class="form-control" ng-model="controller.app.internaluse">
+                                    </div>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -213,6 +231,9 @@
                                 </label>
                                 <div class="col-sm-10 ">
                                     <div class="input-group date ">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary" type="button" ng-click="controller.setDefaultProvisionExpire()">Today+1Year</button>
+                                        </span>
                                         <input ng-disabled="controller.app.platform !='ios' " type="datetime " class="form-control " date-time ng-model="controller.app.provisionexpire " view="year " max-view="year " min-view="date " auto-close="true ">
                                         <span class="input-group-addon "><i class="fa fa-calendar "></i></span>
                                     </div>

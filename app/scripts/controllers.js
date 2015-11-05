@@ -155,6 +155,11 @@ function ClientCreateEditCtrl($scope, ParseClient, $rootScope, $state, $statePar
 
 function AppListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseApp, ParseClient, $rootScope, $state, $stateParams, $timeout, modalalert) {
     var _this = this;
+    
+    this.dtOptions = {
+        pageLength:100
+    };
+    
     this.apps = [];
     this.client = null;
     this.delete = function (app) {
@@ -168,6 +173,17 @@ function AppListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseApp, Par
         });
     };
 
+    this.updateLastUpdate = function(app) {
+        app.lastupdate = new Date();
+        app.data.save().done(function (result) {
+        }).fail(function (error) {
+            modalalert.openAlertWithError(_this, error);
+        }).always(function () {
+            modalalert.closeLoading(_this);
+            $scope.$apply();
+        });
+    }
+    
     this.edit = function (client, app) {
         $rootScope.editClient = client;
         $rootScope.editApp = app;
@@ -191,6 +207,8 @@ function AppListCtrl($scope, DTOptionsBuilder, DTColumnDefBuilder, ParseApp, Par
 
         var appQuery = new Parse.Query(new ParseApp().className);
         appQuery.include('client');
+        appQuery.addAscending('displayname');
+        appQuery.addDescending('platform');
         fetchApps = appQuery.find();
     }
 
@@ -221,6 +239,28 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
     this.base = ftpBase;
     this.versionsrcuploadfiles = [];
     
+    this.updateLastUpdate = function() {
+        _this.app.lastupdate = new Date();
+    }
+    this.setDefaultRequirement = function() {
+        if(_this.app.platform == 'ios') {
+            _this.app.requirement = 'iOS 7.1.1 or above';   
+        }else if(_this.app.platform == 'android') {
+            _this.app.requirement = 'Android 4.0.2 or above';   
+        }else{
+            _this.app.requirement = '';   
+        }
+    }
+    this.setDefaultInternalUse = function() {
+        _this.app.internaluse = 'This app is for Internal Use Only';
+    }
+    this.setDefaultInternalUse = function() {
+        _this.app.internaluse = 'This app is for Internal Use Only';
+    }
+    this.setDefaultProvisionExpire = function() {
+        _this.app.provisionexpire = new Date(Date.now() + 364 * (24 * 60 * 60 * 1000));   
+    }
+    
     this.save = function () {
         modalalert.openLoading(_this, 'Saving...');
         modalalert.closeAlert(_this);
@@ -231,13 +271,8 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
                 message: _this.isEdit ? 'Record ' + app.name + ' is saved to the system.' : 'New record ' + app.name + ' is added to the system.',
                 type: 'success'
             });
-            if (!_this.isEdit) {
-                _this.app = new ParseApp();
-                _this.app.client = _this.client;
-                $scope.form.$setPristine();
-                $scope.$apply();
-            }
             $.post('resources/upload_versionsrc.php', {
+//            $.post('http://infradigital.com.my/appstore/cms/resources/upload_versionsrc.php', {
                 'versionsrcname': _this.versionsrcname(_this.app),
                 'versioncontent': _this.versioncontent(_this.app),
                 'versionsrcdir': _this.versionsrcdir(_this.app)
@@ -253,9 +288,12 @@ function AppCreateEditCtrl(ftpBase, $scope, ParseApp, ParseClient, $modal, $root
                     modalalert.openAlertWithError(_this, 'danger', 'Fail', error);
                 });
             });
-            
-            
-//            _this.testversion();
+            if (!_this.isEdit) {
+                _this.app = new ParseApp();
+                _this.app.client = _this.client;
+                $scope.form.$setPristine();
+                $scope.$apply();
+            }
         }).fail(function (error) {
             modalalert.openAlertWithError(_this, error);
         }).always(function () {
